@@ -34,8 +34,8 @@
             <form action="/deliveries/<%= storeId %>/add" method="POST">
                 <div>
                     <label for="code">Code:</label>
-                    <input type="text" id="code" name="code" required><br><br>
-                </div>
+                    <input type="text" id="code" name="code" required onblur="fetchItemDetails()"><br><br>
+                </div>               
                 
                 <div>
                     <label for="item">Item:</label>
@@ -55,7 +55,7 @@
                 <div>
                     <label for="units">Units:</label>
                     <input type="text" id="units" name="units" required><br><br>
-                </div>
+                </div>             
                 
                 <div>
                     <label for="dateSent">Date Sent:</label>
@@ -191,7 +191,32 @@
                 document.body.classList.remove('overlay-active');
             }
         }); 
-        
+
+        function fetchItemDetails() {
+        const code = document.getElementById("code").value;
+        const storeId = "<%= storeId %>"; // Replace with dynamic storeId if applicable
+
+        if (!code) return;
+
+        // Make an AJAX call to fetch the item details
+        fetch(`/inventory/${storeId}/item?code=${encodeURIComponent(code)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Item not found in inventory.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Fill the form fields with the fetched data
+                document.getElementById("item").value = data.item || "";
+                document.getElementById("description").value = data.description || "";
+                document.getElementById("units").value = data.units || "";
+            })
+            .catch(error => {
+                console.error(error.message);
+                alert(error.message);
+            });
+        }       
     </script>
 </body>
 </html>

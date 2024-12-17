@@ -62,8 +62,12 @@ exports.createDelivery = (req, res) => {
                 `);
             }
 
-            const updateQuery = "UPDATE inventory SET quantity = quantity - ? WHERE code = ? AND item = ? AND store_id = ?";
-            db.run(updateQuery, [quantity, code, item, storeId], function(err) {
+            // Insert the delivery into the inventory for the specified to_store_id
+            const inventoryQuery = `
+                INSERT INTO inventory (code, item, description, quantity, units, date_in, store_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            `;
+            db.run(inventoryQuery, [code, item, description, quantity, units, dateSent, toStoreId], function(err) {
                 if (err) {
                     console.error(err);
                     return res.status(500).send(`
@@ -77,15 +81,31 @@ exports.createDelivery = (req, res) => {
                     `);
                 }
 
-                res.send(`
-                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif;">
-                        <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9; text-align: center;">
-                            <h1 style="color: #2ecc71;">Success</h1>
-                            <p style="font-size: 18px; color: #555;">Delivery record created and inventory updated successfully.</p>
-                            <a href="/deliveries/${storeId}" style="margin-top: 20px; display: inline-block; text-decoration: none; color: #fff; background-color: #3498db; padding: 10px 20px; border-radius: 5px;">View Deliveries</a>
+                const updateQuery = "UPDATE inventory SET quantity = quantity - ? WHERE code = ? AND item = ? AND store_id = ?";
+                db.run(updateQuery, [quantity, code, item, storeId], function(err) {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).send(`
+                            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif;">
+                                <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9; text-align: center;">
+                                    <h1 style="color: #e74c3c;">Error</h1>
+                                    <p style="font-size: 18px; color: #555;">Error updating inventory. Please try again later.</p>
+                                    <a href="/" style="margin-top: 20px; display: inline-block; text-decoration: none; color: #fff; background-color: #3498db; padding: 10px 20px; border-radius: 5px;">Go Back</a>
+                                </div>
+                            </div>
+                        `);
+                    }
+
+                    res.send(`
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif;">
+                            <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9; text-align: center;">
+                                <h1 style="color: #2ecc71;">Success</h1>
+                                <p style="font-size: 18px; color: #555;">Delivery record created, inventory updated and added to the specified store.</p>
+                                <a href="/deliveries/${storeId}" style="margin-top: 20px; display: inline-block; text-decoration: none; color: #fff; background-color: #3498db; padding: 10px 20px; border-radius: 5px;">View Deliveries</a>
+                            </div>
                         </div>
-                    </div>
-                `);
+                    `);
+                });
             });
         });
     });
@@ -228,3 +248,21 @@ exports.getApprovedStores = (req, res) => {
     });
 };
 
+// Route to fetch inventory details by code
+exports.getItemByCode = (req, res) => {
+    const { code } = req.query;
+    const storeId = req.params.storeId;
+
+    db.get("SELECT * FROM inventory WHERE code = ? AND store_id = ?", [code, storeId], (err, row) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Error querying the inventory." });
+        }
+
+        if (!row) {
+            return res.status(404).json({ error: "Item not found in inventory." });
+        }
+
+        res.json(row); // Send the item details as JSON
+    });
+};

@@ -2,22 +2,22 @@ const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
 
-// Get orders for a specific store
-router.get('/:storeId/orders', orderController.getOrders);
+// Route to display all orders
+router.get('/:storeId/orders', orderController.displayOrders);
 
-// Create a new order
+// Route to create a new order
 router.post('/:storeId/orders/add', orderController.createOrder);
 
-// Edit an existing order (GET the order data for the form)
+// Route to render the edit order form
 router.get('/:storeId/orders/edit/:orderId', orderController.editOrder);
 
-// Update an existing order (POST the edited data)
+// Route to handle order updates
 router.post('/:storeId/orders/edit/:orderId', orderController.updateOrder);
 
-// Delete an order
+// Route to delete an order
 router.get('/:storeId/orders/delete/:orderId', orderController.deleteOrder);
 
-
-router.get('/:storeId/order', orderController.getOrdersByDate);
+// Route to display orders based on a selected date
+router.get('/:storeId/orders/search', orderController.searchOrdersByDate);
 
 module.exports = router;

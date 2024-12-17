@@ -110,12 +110,12 @@
                 </tbody>
             </table>
             <div>
-                <form action="/<%= storeId %>/order" method="GET" style="margin-bottom: 20px;">
-                    <label for="deliverDate">Orders for date:</label>
-                    <input type="date" id="deliverDate" name="date" required>
+                <form action="/<%= storeId %>/orders/search" method="GET" style="margin-bottom: 20px;">
+                    <label for="ordersDate">Orders for date:</label>
+                    <input type="date" id="ordersDate" name="date" required>
                     <button type="submit">Order</button>
                 </form>
-            </div>          
+            </div>                
         </div>
     </div>
 

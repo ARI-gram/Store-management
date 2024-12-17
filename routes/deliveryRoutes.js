@@ -24,4 +24,5 @@ router.get('/:storeId/delete/:deliveryId', deliveryController.deleteDelivery);
 // Route to get approved stores
 router.get('/stores/approved', deliveryController.getApprovedStores);
 
+router.get("/inventory/:storeId/item", deliveryController.getItemByCode);
 module.exports = router;

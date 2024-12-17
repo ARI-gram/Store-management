@@ -1,82 +1,40 @@
-/**
- * ARI Gram Technologies - Inventory Management Module
- * This module defines the `Order` model for managing orders in the system.
- * Developed by ARI Gram Technologies.
- */
-
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('../database.db'); // Path to your database file
+const db = new sqlite3.Database('../database.db'); // Adjust the database path as necessary
 
-// Create Orders table if it doesn't exist
-db.serialize(() => {
-    db.run(`
-        CREATE TABLE IF NOT EXISTS orders (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            item_name TEXT,
-            code TEXT,
-            description TEXT,
-            quantity INTEGER,
-            units TEXT,
-            date_ordered TEXT,
-            status TEXT,
-            store_id INTEGER
-        )
-    `);
-});
+// Add a new order
+const addOrder = (order, callback) => {
+    const { item, code, description, quantity, units, dateOrdered, status, storeId } = order;
 
-const Order = {
-    // Get all orders for a specific store
-    getOrdersByStoreId: (storeId, callback) => {
-        db.all("SELECT * FROM orders WHERE store_id = ?", [storeId], (err, rows) => {
-            callback(err, rows);
-        });
-    },
-
-    // Get a specific order by its ID
-    getOrderById: (orderId, callback) => {
-        db.get("SELECT * FROM orders WHERE id = ?", [orderId], (err, row) => {
-            callback(err, row);
-        });
-    },
-
-    // Create a new order
-    createOrder: (orderData, callback) => {
-        const { item_name, code, description, quantity, units, date_ordered, status, store_id } = orderData;
-        db.run(
-            "INSERT INTO orders (item_name, code, description, quantity, units, date_ordered, status, store_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [item_name, code, description, quantity, units, date_ordered, status, store_id],
-            function (err) {
-                callback(err, this.lastID);
-            }
-        );
-    },
-
-    // Update an order
-    updateOrder: (orderId, updatedData, callback) => {
-        const { item_name, code, description, quantity, units, date_ordered, status, store_id } = updatedData;
-        db.run(
-            "UPDATE orders SET item_name = ?, code = ?, description = ?, quantity = ?, units = ?, date_ordered = ?, status = ?, store_id = ? WHERE id = ?",
-            [item_name, code, description, quantity, units, date_ordered, status, store_id, orderId],
-            function (err) {
-                callback(err);
-            }
-        );
-    },
-
-    // Delete an order
-    deleteOrder: (orderId, callback) => {
-        db.run("DELETE FROM orders WHERE id = ?", [orderId], function (err) {
-            callback(err);
-        });
-    },
-
-    // Get all orders for a specific store and date
-    getOrdersByDate: (storeId, date, callback) => {
-        const query = "SELECT item_name, code, description, quantity, units FROM orders WHERE store_id = ? AND date_ordered = ?";
-        db.all(query, [storeId, date], (err, results) => {
-            callback(err, results);
-        });
-    }
+    const query = `
+        INSERT INTO orders (item_name, code, description, quantity, units, date_ordered, status, store_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    db.run(query, [item, code, description, quantity, units, dateOrdered, status, storeId], function(err) {
+        if (err) return callback(err);
+        callback(null, { id: this.lastID });
+    });
 };
 
-module.exports = Order;
+// Fetch all orders for a specific store
+const getOrdersByStoreId = (storeId, callback) => {
+    const query = "SELECT * FROM orders WHERE store_id = ? ORDER BY date_ordered DESC";
+    db.all(query, [storeId], (err, rows) => {
+        if (err) return callback(err);
+        callback(null, rows);
+    });
+};
+
+// Fetch a single order by ID
+const getOrderById = (orderId, storeId, callback) => {
+    const query = "SELECT * FROM orders WHERE id = ? AND store_id = ?";
+    db.get(query, [orderId, storeId], (err, row) => {
+        if (err) return callback(err);
+        callback(null, row);
+    });
+};
+
+module.exports = {
+    addOrder,
+    getOrdersByStoreId,
+    getOrderById,
+};
