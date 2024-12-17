@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deliveries for <%= date %></title>
+    <link rel="stylesheet" href="/styles/deliver.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <p>Current Time: <strong><%= currentTime %></strong></p>
+            </div>
+            <div class="header-right">
+                <p>Current Date: <strong><%= currentDate %></strong></p>
+            </div>
+        </header>
+
+        <main>
+            <section class="title-section">
+                <h1>Deliveries for <%= date %></h1>
+            </section>
+
+            <section class="info-section">
+                <h2>Delivery Information</h2>
+                <% deliveries.forEach(delivery => { %>
+                    <p><strong>To Store:</strong> <%= delivery.to_store_id %></p>
+                    <p><strong>From Store:</strong> <%= delivery.from_store_id %></p>
+                <% }); %>
+            </section>          
+
+            <section class="table-section">
+                <h3>Delivery Table</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Quantity</th>
+                            <th>Units</th>
+                            <th>Item</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% deliveries.forEach(delivery => { %>
+                            <tr>
+                                <td><%= delivery.quantity %></td>
+                                <td><%= delivery.units %></td>
+                                <td><%= delivery.item %></td>
+                                <td><%= delivery.description %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="details-section">
+                <h3>Authorization Details</h3>
+                <% if (deliveries.length > 0) { %>
+                    <p><%= deliveries[0].authorization %></p>
+                <% } else { %>
+                    <p>No authorization details available.</p>
+                <% } %>
+                <br><br>
+                <h3>Driver Details</h3>
+                <% if (deliveries.length > 0) { %>
+                    <p><%= deliveries[0].vehicle_no %></p>
+                <% } else { %>
+                    <p>No driver details available.</p>
+                <% } %>
+            </section>     
+
+            <section class="confirmation-section">
+                <h3>Confirmation</h3>
+                <p>Confirm Received:</p>
+                <div class="confirmation-fields">
+                    <p>
+                        <label>Name:</label> _______________________________
+                    </p>
+                    <p>
+                        <label>ID:</label> _________________________________
+                    </p>
+                    <p>
+                        <label>Sign:</label> _______________________________
+                    </p>
+                </div>
+                <br><br>
+                <p><label>Stamp:</label> </p>
+            </section>
+        </main>
+    </div>
+   <!-- Existing Deliver Page Content -->
+
+<section class="actions-section">
+    <button onclick="window.print()">Print</button>
+    <a href="javascript:history.back()" class="back-button">Back</a>
+</section>
+
+<!-- Modal for selecting a store -->
+<div id="send-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>Select Store to Send Delivery</h3>
+        <ul id="store-list"></ul>
+        <button onclick="closeModal()">Cancel</button>
+    </div>
+</div>
+<script>
+    function openModal() {
+        document.getElementById('send-modal').style.display = 'block';
+
+        // Fetch the approved stores and populate the list
+        fetch('/stores/approved')
+            .then(response => response.json())
+            .then(data => {
+                const storeList = document.getElementById('store-list');
+                storeList.innerHTML = ''; // Clear the list
+
+                // Add each store to the modal
+                data.forEach(store => {
+                    const listItem = document.createElement('li');
+
+                    // Add the store ID as plain text
+                    const storeIdSpan = document.createElement('span');
+                    storeIdSpan.textContent = `Store ID: ${store.store_id} - `;
+
+                    // Create Gmail compose link
+                    const gmailLink = document.createElement('a');
+                    const subject = encodeURIComponent("Delivery Details");
+                    const body = encodeURIComponent(serializeDeliverContent());
+                    gmailLink.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${store.email}&su=${subject}&body=${body}`;
+                    gmailLink.textContent = store.email;
+                    gmailLink.target = '_blank'; // Open in a new tab
+
+                    // Append the store ID and email link to the list item
+                    listItem.appendChild(storeIdSpan);
+                    listItem.appendChild(gmailLink);
+
+                    // Add the list item to the modal
+                    storeList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching approved stores:', error);
+            });
+    }
+
+    function serializeDeliverContent() {
+        // Extract the relevant content from the delivery page
+        const title = document.querySelector('.title-section h1').innerHTML;
+        const deliveryInfo = document.querySelector('.info-section').innerHTML;
+        const table = document.querySelector('.table-section').innerHTML;
+        const authorization = document.querySelector('.details-section').innerHTML;
+        const confirmation = document.querySelector('.confirmation-section').innerHTML;
+
+        // Construct a formatted email body with HTML content
+        return `
+            <h1>${title}</h1>
+            <h2>Delivery Information</h2>
+            ${deliveryInfo}
+            <h3>Delivery Table</h3>
+            ${table}
+            <h3>Authorization Details</h3>
+            ${authorization}
+            <h3>Confirmation</h3>
+            ${confirmation}
+        `;
+    }
+
+    function closeModal() {
+        document.getElementById('send-modal').style.display = 'none';
+    }
+</script>
+
+</body>
+
+</html>

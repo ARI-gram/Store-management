@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            background: url('/images/image4.jpg') no-repeat center center fixed;
+            background-size: cover;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background-color: rgba(0, 0, 0, 0.8);
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #3498db;
+            font-size: 18px;
+            transition: color 0.3s ease, border-bottom 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        nav ul li a:hover {
+            color: #2ecc71;
+            border-bottom: 2px solid #2ecc71;
+        }
+
+        /* Main Content */
+        main {
+            text-align: center;
+            margin: 50px auto;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        main h2 {
+            font-size: 1.8em;
+            color: #3498db;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            color: #fff;
+            background: #3498db;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #2ecc71;
+            transform: scale(1.05);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        #company-list {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #company-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #company-list ul li {
+            margin: 10px 0;
+        }
+
+        #company-list ul li a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        #company-list ul li a:hover {
+            color: #2ecc71;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Admin Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <button onclick="location.href='/pending-users'" class="btn">Pending Approvals</button>
+        <button onclick="location.href='/active-users'" class="btn">Active Users</button>
+        <button onclick="location.href='/stores'" class="btn">Stores</button>
+        <button onclick="showSearchInput()" class="btn">Search</button>
+
+        <div id="search-box" style="display: none; margin-top: 20px;">
+            <input type="text" id="search-input" placeholder="Enter your search term" style="padding: 10px; width: 70%; border-radius: 5px;">
+            <button onclick="searchQuery()" class="btn">Submit</button>
+        </div>
+
+        <div id="company-list" style="display: none;">
+            <h2>Company List</h2>
+            <ul id="companies"></ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Client Records, All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        function fetchCompanies() {
+            fetch('/admin/companies')
+                .then(response => response.json())
+                .then(data => {
+                    const companyList = document.getElementById('companies');
+                    companyList.innerHTML = ''; // Clear previous list
+                    data.forEach(company => {
+                        const listItem = document.createElement('li');
+                        const link = document.createElement('a');
+                        link.href = `/dashboard/${company.company_id}`;
+                        link.textContent = company.company_name;
+                        listItem.appendChild(link);
+                        companyList.appendChild(listItem);
+                    });
+
+                    document.getElementById('company-list').style.display = 'block';
+                })
+                .catch(err => {
+                    console.error('Error fetching companies:', err);
+                    alert('Error fetching company list.');
+                });
+        }
+
+        function showSearchInput() {
+        document.getElementById('search-box').style.display = 'block';
+    }
+
+    function searchQuery() {
+        const query = document.getElementById('search-input').value;
+        if (query) {
+            location.href = `/search?query=${encodeURIComponent(query)}`;
+        } else {
+            alert('Please enter a search term!');
+        }
+    }
+    </script>
+
+</body>
+</html>

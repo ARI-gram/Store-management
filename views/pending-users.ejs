@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pending Users</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333333;
+      margin-bottom: 20px;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #0056b3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto;
+      background-color: #ffffff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #dddddd;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    button {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .approve-btn {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .approve-btn:hover {
+      background-color: #218838;
+    }
+
+    .reject-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .reject-btn:hover {
+      background-color: #c82333;
+    }
+
+    form {
+      display: inline;
+    }
+
+    .back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007BFF; /* Blue background */
+    color: #fff; /* White text */
+    text-decoration: none; /* Remove underline */
+    font-size: 16px; /* Text size */
+    border-radius: 5px; /* Rounded corners */
+    border: 1px solid #0056b3; /* Border with darker shade */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+.back-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Slightly bigger shadow */
+    transform: translateY(-2px); /* Subtle lift on hover */
+}
+
+.back-button:active {
+    background-color: #004085; /* Even darker blue when clicked */
+    transform: translateY(0); /* Return to original position */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); /* Reduced shadow */
+}
+
+  </style>
+</head>
+<!-- Back Button -->
+<a href="javascript:history.back()" class="back-button">Back</a>
+
+<body>
+  <h1>Pending Users</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Store ID</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(user => { %>
+        <tr>
+          <td><%= user.email %></td>
+          <td><%= user.store_id %></td>
+          <td><%= user.role %></td>
+          <td>
+            <form action="/approve-user" method="POST">
+                <input type="hidden" name="email" value="<%= user.email %>">
+                <button type="submit" class="approve-btn">Approve</button>
+            </form>
+            <form action="/reject-user" method="POST">
+                <input type="hidden" name="email" value="<%= user.email %>">
+                <button type="submit" class="reject-btn">Reject</button>
+            </form>
+          </td>        
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</body>
+</html>

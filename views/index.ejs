@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Sign In</title>
+    <style>
+        /* General body styling */
+        body {
+            font-family: Arial, sans-serif;
+            background: url('/images/pic1.jpg') no-repeat center center fixed;
+            background-size: cover;
+            backdrop-filter: blur(8px);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Add an overlay to enhance contrast */
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            width: 320px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            width: 48%;
+            padding: 10px;
+            background-color: #ddd;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .tab-button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 95%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Footer with powered by text */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .footer span {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div class="login-container">
+        <h2>Login</h2>
+        
+        <!-- Tabs for Login and Sign In -->
+        <div class="form-tabs">
+            <button class="tab-button active" id="loginTabBtn">Login</button>
+            <button class="tab-button" id="signInTabBtn">Sign In</button>
+        </div>
+        
+        <!-- Login Form -->
+        <form id="loginForm" class="form" action="/login" method="POST">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="storeId">Store ID</label>
+                <input type="text" id="storeId" name="storeId" required placeholder="Enter store ID">
+            </div>
+            <div class="form-group">
+                <label for="role">Role</label>
+                <input type="text" id="role" name="role" required placeholder="Enter your role">
+            </div>
+            <button type="button" id="generateOtpBtn" class="btn">Generate OTP</button>
+            <div class="form-group">
+                <label for="otp">OTP</label>
+                <input type="text" id="otp" name="otp" required placeholder="Enter OTP">
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form id="signInForm" class="form" action="/signup" method="POST" style="display: none;">
+            <div class="form-group">
+                <label for="signInEmail">Email Address</label>
+                <input type="email" id="signInEmail" name="signInEmail" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="signInStoreId">Store ID</label>
+                <input type="text" id="signInStoreId" name="signInStoreId" required placeholder="Enter store ID">
+            </div>
+            <div class="form-group">
+                <label for="signInRole">Role</label>
+                <input type="text" id="signInRole" name="signInRole" required placeholder="Enter role">
+            </div>
+            <button type="submit" class="btn">Sign Up</button>
+        </form>
+
+        <div class="footer">
+            Powered by <span>ARI-gram Technologies</span>
+        </div>
+    </div>
+
+    <script>
+        // Toggle between Login and Sign In forms
+        document.getElementById('loginTabBtn').addEventListener('click', function () {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signInForm').style.display = 'none';
+            document.getElementById('loginTabBtn').classList.add('active');
+            document.getElementById('signInTabBtn').classList.remove('active');
+        });
+    
+        document.getElementById('signInTabBtn').addEventListener('click', function () {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signInForm').style.display = 'block';
+            document.getElementById('signInTabBtn').classList.add('active');
+            document.getElementById('loginTabBtn').classList.remove('active');
+        });
+    
+        // Handle OTP generation
+        document.getElementById('generateOtpBtn').addEventListener('click', function () {
+            const email = document.getElementById('email').value;
+    
+            if (!email) {
+                alert("Please enter a valid email.");
+                return;
+            }
+    
+            fetch('/auth/generate-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'OTP sent successfully.') {
+                    alert('OTP has been sent to your email.');
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error generating OTP:', error);
+                alert('An error occurred while generating OTP.');
+            });
+        });
+    
+        // Handle Login form submission
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+    
+            const email = document.getElementById('email').value;
+            const otp = document.getElementById('otp').value;
+            const storeId = document.getElementById('storeId').value;  // Store ID
+            const role = document.getElementById('role').value;        // Role
+    
+            fetch('/auth/verify-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, otp, storeId, role }),  // Send storeId and role along with email and OTP
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                } else if (data.message) {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error verifying OTP:', error);
+                alert('An error occurred.');
+            });
+        });
+    
+        // Handle Sign-In form submission
+        document.getElementById('signInForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+    
+            const signInEmail = document.getElementById('signInEmail').value;
+            const signInStoreId = document.getElementById('signInStoreId').value; // Store ID for signup
+            const signInRole = document.getElementById('signInRole').value;     // Role for signup
+    
+            fetch('/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ signInEmail, signInStoreId, signInRole }),  // Send storeId and role for signup
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error during sign-up:', error);
+                alert('An error occurred.');
+            });
+        });
+    
+    </script>    
+</body>
+</html>

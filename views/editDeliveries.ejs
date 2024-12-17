@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Delivery</title>
+    <link rel="stylesheet" href="/styles/edit-delivery.css"> 
+</head>
+<body>
+    <div class="content">
+        <!-- Edit Delivery Form -->
+        <div id="formPage" class="page">
+            <h1>Edit Delivery</h1>
+            <form action="/deliveries/<%= storeId %>/edit/<%= delivery.id %>" method="POST">
+                <div>
+                    <label for="code">Code:</label>
+                    <input type="text" id="code" name="code" value="<%= delivery.code %>" required><br><br>
+                </div>
+
+                <div>
+                    <label for="item">Item:</label>
+                    <input type="text" id="item" name="item" value="<%= delivery.item %>" required><br><br>
+                </div>
+
+                <div>
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" required><%= delivery.description %></textarea><br><br>
+                </div>
+
+                <div>
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" value="<%= delivery.quantity %>" required><br><br>
+                </div>
+
+                <div>
+                    <label for="units">Units:</label>
+                    <input type="text" id="units" name="units" value="<%= delivery.units %>" required><br><br>
+                </div>
+
+                <div>
+                    <label for="dateSent">Date Sent:</label>
+                    <input type="date" id="dateSent" name="dateSent" value="<%= delivery.date_sent %>" required><br><br>
+                </div>
+
+                <div>
+                    <label for="timeSent">Time Sent:</label>
+                    <input type="time" id="timeSent" name="timeSent" value="<%= delivery.time_sent %>" required><br><br>
+                </div>
+
+                <div>
+                    <label for="driver">Driver:</label>
+                    <textarea id="driver" name="driver" required><%= delivery.driver %></textarea><br><br>
+                </div>
+                
+                <div>
+                    <label for="authorization">Authorization:</label>
+                    <textarea id="authorization" name="authorization" required><%= delivery.authorization %></textarea><br><br>
+                </div>
+                
+                <div>
+                    <label for="vehicleNo">Vehicle No:</label>
+                    <input type="text" id="vehicleNo" name="vehicleNo" value="<%= delivery.vehicle_no %>" required><br><br>
+                </div>
+
+                <div>
+                    <label for="received">Received:</label>
+                    <select id="received" name="received" required>
+                        <option value="Yes" <%= delivery.received === "Yes" ? "selected" : "" %>>Yes</option>
+                        <option value="No" <%= delivery.received === "No" ? "selected" : "" %>>No</option>
+                    </select><br><br>
+                </div>
+
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

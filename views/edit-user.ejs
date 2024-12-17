@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit User</title>
+  <style>
+    /* Styles for form layout */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f9;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <form action="/edit-user/<%= user.email %>/<%= user.store_id %>" method="POST">
+    <h2>Edit User</h2>
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" value="<%= user.email %>" required>
+    <label for="role">Role:</label>
+    <input type="text" id="role" name="role" value="<%= user.role %>" required>
+    <button type="submit">Save Changes</button>
+  </form>
+</body>
+</html>

@@ -1,0 +1,123 @@
+body {
+    font-family: 'Arial', sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #3498db;
+    font-size: 18px;
+    border-bottom: 2px solid transparent;
+}
+
+nav ul li a:hover {
+    border-bottom: 2px solid #3498db;
+}
+
+#inventory-graph, #calendar {
+    margin: 30px auto;
+    width: 80%;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.footer {
+    text-align: center;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer span {
+    color: #3498db;
+}
+
+.sidebar {
+    position: fixed;
+    left: -300px;
+    top: 0;
+    height: 80%;
+    width: 300px;
+    background-color: rgba(68, 68, 68, 0.5); 
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    transition: left 0.3s ease;
+    padding: 20px;
+    z-index: 1000;
+}
+.sidebar.active {
+    left: 0;
+}
+.sidebar .logout-button {
+    display: block;
+    margin-top: 20px;
+    color: white;
+    background-color: #007BFF;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    text-decoration: none;
+}
+.logout-button{
+    color: white;
+    background-color: #007BFF;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    text-decoration: none;
+    width: 50%;
+}
+.overlay-active .sidebar {
+    left: 0;
+}
+
+/* Overlay Styles */
+.overlay-active::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* Toggle Button */
+.toggle-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1001;
+}

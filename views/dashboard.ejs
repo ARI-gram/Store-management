@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - <%= storeId %></title>
+    <link rel="stylesheet" href="/styles/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+<body style="background: url('/images/pic2.jpg') no-repeat center center fixed; background-size: cover;">
+
+    <!-- Toggle Button -->
+    <button class="toggle-button" onclick="toggleSidebar()">Menu</button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div>
+            <h2>User Details</h2>
+            <p><strong>Email:</strong> <%= user.email %></p>
+            <p><strong>Role:</strong> <%= user.role %></p>
+            <p><strong>Store ID:</strong> <%= user.storeId || 'All Stores' %></p>
+        </div>
+        <br><br><br><br><br>
+
+        <!-- Logout Button -->
+        <a href="/logout" class="logout-button">Log Out</a>
+    </aside>
+
+    <header>
+        <h1>Welcome to Store Dashboard: <%= storeId %></h1>
+    </header>
+
+    <main>
+        <nav>
+            <ul>
+                <li><a href="/<%= storeId %>/inventory">Inventory</a></li>
+                <li><a href="/<%= storeId %>/orders">Orders</a></li>
+                <li><a href="/deliveries/<%= storeId %>">Deliveries</a></li>
+            </ul>
+        </nav>
+
+        <section id="inventory-graph">
+            <h2>Inventory Overview</h2>
+            <canvas id="inventoryChart"></canvas>
+        </section>
+
+        <section id="calendar">
+            <h2>Current Date & Time</h2>
+            <div id="dateTime"></div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        Powered by <span>ARI-gram Technologies</span>
+    </footer>
+
+    <script>
+    // Sidebar toggle
+    function toggleSidebar() {
+        document.body.classList.toggle('overlay-active');
+    }
+
+    try {
+        // Safely pass inventory data from server
+        const rawInventory = `<%- JSON.stringify(inventory).replace(/</g, '\u003c') %>`;
+        console.log('Raw Inventory Data:', rawInventory);
+
+        // Parse the raw JSON to ensure it's valid
+        const inventoryData = JSON.parse(rawInventory);
+
+        const labels = inventoryData.map(item => item.item);
+        const quantities = inventoryData.map(item => item.quantity);
+
+        // Initialize chart
+        const ctx = document.getElementById('inventoryChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Inventory Levels',
+                    data: quantities,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true },
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error processing inventory data:', error);
+    }
+
+    // Calendar and Time
+    function updateDateTime() {
+        const now = new Date();
+        document.getElementById('dateTime').innerHTML = now.toLocaleString();
+    }
+    setInterval(updateDateTime, 1000);
+    </script>
+
+</body>
+</html>

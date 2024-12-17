@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Active Users</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url('/images/image4.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 2rem;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    .back-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #2ecc71;
+      color: white;
+      text-decoration: none;
+      font-size: 1rem;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .back-button:hover {
+      background-color: #27ae60;
+    }
+
+    table {
+      width: 90%;
+      max-width: 1200px;
+      margin: 20px 0;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    thead {
+      background-color: #3498db;
+      color: #fff;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      font-size: 1rem;
+      text-transform: uppercase;
+    }
+
+    tbody tr:hover {
+      background-color: #f2f2f2;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 8px 15px;
+      margin: 0 5px;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    button.new-store {
+      background-color: #f39c12;
+      color: white;
+    }
+
+    button.new-store:hover {
+      background-color: #e67e22;
+    }
+
+    button[type="submit"] {
+      background-color: #3498db;
+      color: #fff;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #2980b9;
+    }
+
+    button.delete {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    button.delete:hover {
+      background-color: #c0392b;
+    }
+
+    button[type="submit"]:active {
+      transform: scale(0.98);
+    }
+
+    form {
+      display: inline;
+    }
+
+    @media screen and (max-width: 768px) {
+      table {
+        font-size: 0.9rem;
+      }
+
+      th, td {
+        padding: 10px;
+      }
+
+      button {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+
+      input[type="text"] {
+        padding: 6px;
+      }
+
+      .back-button {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Back Button -->
+  <a href="javascript:history.back()" class="back-button">Back</a>
+
+  <h1>Active Users</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Store ID</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(user => { %>
+        <tr>
+          <td><input type="text" name="email" value="<%= user.email %>" readonly /></td>
+          <td><%= user.store_id %></td>
+          <td><input type="text" name="role" value="<%= user.role %>" /></td>
+          <td>
+            <!-- Edit User -->
+            <form action="/edit-user/<%= user.email %>/<%= user.store_id %>" method="GET" style="display:inline;">
+              <button type="submit" style="background-color: #3498db; color: white;">Edit</button>
+            </form>
+
+            <!-- Delete User -->
+            <form action="/delete-user/<%= user.email %>/<%= user.store_id %>" method="POST" style="display:inline;">
+              <button type="submit" class="delete">Delete</button>
+            </form>
+
+            <!-- New Store -->
+            <form action="/new-store" method="GET" style="display:inline;">
+              <input type="hidden" name="email" value="<%= user.email %>" />
+              <input type="hidden" name="store_id" value="<%= user.store_id %>" />
+              <button type="submit" class="new-store">New Store</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</body>
+</html>

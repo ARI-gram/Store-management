@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stores</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url('/images/image4.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 2rem;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    .back-button {
+      align-self: flex-start;
+      margin: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #0056b3;
+    }
+
+    table {
+      width: 90%;
+      max-width: 1200px;
+      margin: 20px 0;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    thead {
+      background-color: #3498db;
+      color: #fff;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    tbody tr:hover {
+      background-color: #f2f2f2;
+    }
+
+    button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    button.edit {
+      background-color: #3498db;
+      color: white;
+    }
+
+    button.edit:hover {
+      background-color: #2980b9;
+    }
+
+    button.delete {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    button.delete:hover {
+      background-color: #c0392b;
+    }
+
+    .back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007BFF; /* Blue background */
+    color: #fff; /* White text */
+    text-decoration: none; /* Remove underline */
+    font-size: 16px; /* Text size */
+    border-radius: 5px; /* Rounded corners */
+    border: 1px solid #0056b3; /* Border with darker shade */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+.back-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Slightly bigger shadow */
+    transform: translateY(-2px); /* Subtle lift on hover */
+}
+
+.back-button:active {
+    background-color: #004085; /* Even darker blue when clicked */
+    transform: translateY(0); /* Return to original position */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); /* Reduced shadow */
+}
+
+  </style>
+</head>
+<a href="javascript:history.back()" class="back-button">Back</a>
+<body>
+  <h1>Stores</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Store ID</th>
+        <th>Email</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% stores.forEach(store => { %>
+        <tr>
+          <td><%= store.store_id %></td>
+          <td><%= store.email %></td>
+          <td><%= store.created_at %></td>
+          <td>
+            <form action="/edit-store/<%= store.store_id %>" method="GET" style="display:inline;">
+              <button type="submit" class="edit">Edit</button>
+            </form>
+            <form action="/delete-store/<%= store.store_id %>" method="POST" style="display:inline;">
+              <button type="submit" class="delete">Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</body>
+</html>
