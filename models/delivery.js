@@ -1,6 +1,4 @@
-// models/delivery.js
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('../database.db');  // Adjust the database path if necessary
+const db = require('../db');
 
 // Function to add a delivery
 const addDelivery = (delivery, callback) => {

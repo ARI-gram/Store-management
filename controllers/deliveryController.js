@@ -1,5 +1,4 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./database.db'); // Path to your SQLite database
+const db = require('../db');
 const moment = require('moment');
 
 exports.createDelivery = (req, res) => {

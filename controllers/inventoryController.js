@@ -1,5 +1,4 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./database.db'); // Ensure correct database path
+const db = require('../db');
 
 exports.showInventory = (req, res) => {
   const storeId = req.params.storeId;

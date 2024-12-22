@@ -1,5 +1,4 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('../database.db'); // Adjust the database path as necessary
+const db = require('../db');
 
 // Add a new order
 const addOrder = (order, callback) => {

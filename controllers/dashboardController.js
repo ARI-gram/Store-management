@@ -1,4 +1,4 @@
-const db = require('../models/dashboard');
+const db = require('../db');
 
 exports.getDashboard = (req, res) => {
     const { user } = req.session; // Get user info from session
