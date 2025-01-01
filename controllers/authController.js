@@ -303,8 +303,51 @@ exports.createStore = async (req, res) => {
     );
 
     if (existingStore.rows.length > 0) {
-      return res.status(400).send('Store already exists.');
-    }
+      return res.status(400).send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Store Exists</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              height: 100vh;
+              margin: 0;
+              background-color: #f8f9fa;
+            }
+            .message {
+              font-size: 1.5em;
+              color: #dc3545;
+              margin-bottom: 20px;
+            }
+            .button {
+              padding: 10px 20px;
+              font-size: 1em;
+              color: #fff;
+              background-color: #007bff;
+              border: none;
+              border-radius: 5px;
+              text-decoration: none;
+              cursor: pointer;
+            }
+            .button:hover {
+              background-color: #0056b3;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="message">Store already exists.</div>
+          <a href="javascript:history.back()" class="button">Go Back</a>
+        </body>
+        </html>
+      `);
+    }  
 
     // Insert a new store
     const createdAt = new Date().toISOString();
