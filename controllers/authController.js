@@ -215,7 +215,7 @@ exports.approveUser = async (req, res) => {
     }
 
     console.log('User approved successfully:', email);
-    res.render('pending-users', { users: result.rows });
+    res.render('active-users', { users: result.rows });
   } catch (err) {
     console.error('Error approving user:', err);
     res.status(500).send('Error approving user.');
@@ -370,19 +370,30 @@ exports.updateStore = async (req, res) => {
   }
 };
 
-// Delete a store
 exports.deleteStore = async (req, res) => {
   const storeId = req.params.store_id;
 
   try {
+    await pool.query('BEGIN'); // Start transaction
+
+    // Delete related rows manually
+    await pool.query('DELETE FROM deliveries WHERE store_id = $1 OR from_store_id = $1 OR to_store_id = $1', [storeId]);
+    await pool.query('DELETE FROM utilize WHERE store_id = $1', [storeId]);
+    await pool.query('DELETE FROM orders WHERE store_id = $1', [storeId]);
+    await pool.query('DELETE FROM inventory WHERE store_id = $1', [storeId]);
+
+    // Delete the store itself
     const result = await pool.query('DELETE FROM stores WHERE store_id = $1', [storeId]);
 
     if (result.rowCount === 0) {
+      await pool.query('ROLLBACK'); // Rollback transaction
       return res.status(404).send('Store not found.');
     }
 
+    await pool.query('COMMIT'); // Commit transaction
     res.redirect('/stores');
   } catch (err) {
+    await pool.query('ROLLBACK'); // Rollback transaction on error
     console.error('Error deleting store:', err);
     res.status(500).send('Database error.');
   }
