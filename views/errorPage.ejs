@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Denied</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        a {
+            font-size: 18px;
+            text-decoration: none;
+            color: #2980b9;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: 2px solid #2980b9;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        a:hover {
+            background-color: #2980b9;
+            color: #ffffff;
+        }
+
+        /* Mobile-Friendly */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 28px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
+            a {
+                font-size: 16px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Access Denied</h1>
+        <p><%= message %></p>
+        <a href="/">Return to Home</a>
+    </div>
+
+</body>
+</html>

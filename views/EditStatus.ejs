@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Order Status</title>
+    <link rel="stylesheet" href="/styles/order.css">
+</head>
+<body>
+    <div class="menu-bar">
+        <ul>
+            <li><a href="/dashboard/<%= storeId %>">Dashboard</a></li>
+            <li><a href="/<%= storeId %>/inventory">Inventory</a></li>
+            <li><a href="/<%= storeId %>/orders">Orders</a></li>
+            <li><a href="/deliveries/<%= storeId %>">Deliveries</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <h1>Edit Order Status</h1>
+
+        <% if (error) { %>
+            <p style="color: red;"><%= error %></p>
+        <% } else { %>
+            <form action="/orders/<%= order ? order.id : '' %>/update-status?storeId=<%= storeId %>" method="POST">
+                <label for="status">Select Status:</label>
+                <select name="status" id="status" required>
+                    <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                </select>
+                <button type="submit">Update Status</button>
+                <a href="javascript:history.back()" class="back-button">Back</a>
+            </form>                       
+        <% } %>
+    </div>
+</body>
+</html>

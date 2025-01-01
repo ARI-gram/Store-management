@@ -1,51 +1,69 @@
-const db = require('../db');
+const pool = require('../db');
 
 // Function to add a delivery
-const addDelivery = (delivery, callback) => {
-    const { code, item, description, quantity, units, dateSent, timeSent, driver, authorization, vehicleNo, storeId, received } = delivery;
+const addDelivery = async (delivery, callback) => {
+    const {
+        code,
+        item,
+        description,
+        quantity,
+        units,
+        dateSent,
+        timeSent,
+        driver,
+        authorization,
+        vehicleNo,
+        storeId,
+        received
+    } = delivery;
 
-    // Check if inventory has enough quantity
-    const checkInventoryQuery = `SELECT * FROM inventory WHERE code = ? AND item = ? AND store_id = ?`;
-    db.get(checkInventoryQuery, [code, item, storeId], (err, row) => {
-        if (err) {
-            return callback(err);
-        }
+    try {
+        // Start a transaction
+        await pool.query('BEGIN');
 
-        if (!row || row.quantity < quantity) {
-            return callback(new Error('Not enough stock in inventory.'));
+        // Check if inventory has enough quantity
+        const checkInventoryQuery = `SELECT * FROM inventory WHERE code = $1 AND item = $2 AND store_id = $3`;
+        const inventoryResult = await pool.query(checkInventoryQuery, [code, item, storeId]);
+
+        if (inventoryResult.rows.length === 0 || inventoryResult.rows[0].quantity < quantity) {
+            throw new Error('Not enough stock in inventory.');
         }
 
         // Insert the delivery record into the deliveries table
-        const insertDeliveryQuery = `INSERT INTO deliveries (code, item, description, quantity, units, date_sent, time_sent, driver, authorization, vehicle_no, store_id, received)
-                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const insertDeliveryQuery = `
+            INSERT INTO deliveries (code, item, description, quantity, units, date_sent, time_sent, driver, authorization, vehicle_no, store_id, received)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            RETURNING id
+        `;
+        const deliveryResult = await pool.query(insertDeliveryQuery, [
+            code, item, description, quantity, units, dateSent, timeSent, driver, authorization, vehicleNo, storeId, received
+        ]);
 
-        db.run(insertDeliveryQuery, [code, item, description, quantity, units, dateSent, timeSent, driver, authorization, vehicleNo, storeId, received], function (err) {
-            if (err) {
-                return callback(err);
-            }
+        // Update inventory by subtracting the quantity delivered
+        const updateInventoryQuery = `UPDATE inventory SET quantity = quantity - $1 WHERE code = $2 AND item = $3 AND store_id = $4`;
+        await pool.query(updateInventoryQuery, [quantity, code, item, storeId]);
 
-            // Update inventory by subtracting the quantity delivered
-            const updateInventoryQuery = `UPDATE inventory SET quantity = quantity - ? WHERE code = ? AND item = ? AND store_id = ?`;
-            db.run(updateInventoryQuery, [quantity, code, item, storeId], (err) => {
-                if (err) {
-                    return callback(err);
-                }
+        // Commit the transaction
+        await pool.query('COMMIT');
 
-                callback(null, { id: this.lastID });
-            });
-        });
-    });
+        callback(null, { id: deliveryResult.rows[0].id });
+    } catch (err) {
+        // Rollback the transaction in case of error
+        await pool.query('ROLLBACK');
+        callback(err);
+    }
 };
 
 // Function to get deliveries for a specific store
-const getDeliveriesByStoreId = (storeId, callback) => {
-    const query = `SELECT * FROM deliveries WHERE store_id = ? ORDER BY date_sent DESC`;
-    db.all(query, [storeId], (err, rows) => {
-        if (err) {
-            return callback(err);
-        }
-        callback(null, rows);
-    });
+const getDeliveriesByStoreId = async (storeId, callback) => {
+    const query = `SELECT * FROM deliveries WHERE store_id = $1 ORDER BY date_sent DESC`;
+
+    try {
+        const result = await pool.query(query, [storeId]);
+        callback(null, result.rows);
+    } catch (err) {
+        callback(err);
+    }
 };
 
 module.exports = {

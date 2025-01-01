@@ -17,4 +17,24 @@ router.post('/:storeId/inventory/edit/:code', inventoryController.updateInventor
 // Route to handle deleting an inventory item
 router.get('/:storeId/inventory/delete/:code', inventoryController.deleteInventory);
 
+router.get('/:storeId/inventory/utilize/:code', inventoryController.utilizeInventoryForm);
+
+router.post('/:storeId/inventory/utilize/:code', inventoryController.utilizeInventory);
+
+router.get('/:storeId/utilizeReport', inventoryController.showUtilizationReport);
+
+// Edit utilization
+router.get('/:storeId/utilize/edit/:code', inventoryController.editUtilizationForm);
+router.post('/:storeId/utilize/edit/:code', inventoryController.updateUtilization);
+
+// Delete utilization
+router.post('/:storeId/utilize/delete/:code', inventoryController.deleteUtilization);
+
+// Edit utilization
+router.get('/:storeId/utilize/edit/:code', inventoryController.editUtilizationForm);
+router.post('/:storeId/utilize/edit/:code', inventoryController.updateUtilization);
+
+// Delete utilization
+router.post('/:storeId/utilize/delete/:code', inventoryController.deleteUtilization);
+
 module.exports = router;

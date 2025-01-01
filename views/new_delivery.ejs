@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Deliveries</title>
+    <link rel="stylesheet" href="/styles/newdelivery.css">
+</head>
+<body>
+    <div class="menu-bar">
+        <ul>
+            <li><a href="/dashboard/<%= storeId %>">Dashboard</a></li>
+            <li><a href="/<%= storeId %>/inventory">Inventory</a></li>
+            <li><a href="/<%= storeId %>/orders">Orders</a></li>
+            <li><a href="/deliveries/<%= storeId %>">Deliveries</a></li>
+        </ul>
+    </div>
+    <div class="container">
+        <h1>Deliveries for Store: <%= storeId %></h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Item</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Units</th>
+                    <th>Date Sent</th>
+                    <th>Time Sent</th>
+                    <th>Driver</th>
+                    <th>Authorization</th>
+                    <th>Vehicle No</th>
+                    <th>From Store ID</th>
+                    <th>To Store ID</th>
+                    <th>Received</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% deliveries.forEach(delivery => { %>
+                    <tr>
+                        <td><%= delivery.code %></td>
+                        <td><%= delivery.item %></td>
+                        <td><%= delivery.description %></td>
+                        <td><%= delivery.quantity %></td>
+                        <td><%= delivery.units %></td>
+                        <td><%= delivery.date_sent %></td>
+                        <td><%= delivery.time_sent %></td>
+                        <td><%= delivery.driver %></td>
+                        <td><%= delivery.authorization %></td>
+                        <td><%= delivery.vehicle_no %></td>
+                        <td><%= delivery.from_store_id %></td>
+                        <td><%= delivery.to_store_id %></td>
+                        <td><%= delivery.received %></td>
+                        <td>
+                            <% if (delivery.received === 'no') { %>
+                                <form id="delivery-form-<%= delivery.id %>">
+                                    <label for="received-<%= delivery.id %>">Received:</label>
+                                    <select id="received-<%= delivery.id %>" name="received">
+                                        <option value="yes">Yes</option>
+                                        <option value="no" selected>No</option>
+                                    </select>
+                                    <button type="button" onclick="updateDeliveryStatus('<%= delivery.to_store_id %>', '<%= delivery.id %>')">Update</button>
+                                    <span id="status-message-<%= delivery.id %>" class="status-message"></span>
+                                </form>
+                            <% } else { %>
+                                <span>Already Marked as Received</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        async function updateDeliveryStatus(toStoreId, deliveryId) {
+            const selectElement = document.getElementById(`received-${deliveryId}`);
+            const statusMessage = document.getElementById(`status-message-${deliveryId}`);
+            const receivedValue = selectElement.value;
+
+            try {
+                const response = await fetch(`/deliveries/update/${deliveryId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ received: receivedValue })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusMessage.textContent = result.message;
+                    statusMessage.classList.add('success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    statusMessage.textContent = result.error || 'Failed to update.';
+                    statusMessage.classList.add('error');
+                }
+            } catch (err) {
+                console.error(err);
+                statusMessage.textContent = 'Error occurred during the update.';
+                statusMessage.classList.add('error');
+            }
+        }
+    </script>
+</body>
+</html>

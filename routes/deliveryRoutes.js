@@ -25,4 +25,11 @@ router.get('/:storeId/delete/:deliveryId', deliveryController.deleteDelivery);
 router.get('/stores/approved', deliveryController.getApprovedStores);
 
 router.get("/inventory/:storeId/item", deliveryController.getItemByCode);
+
+// Route to render new delivery page with deliveries data
+router.get('/:storeId/new', deliveryController.displayNewDeliveries);
+
+// New route for updating delivery status
+router.post('/deliveries/update/:deliveryId', deliveryController.updateDeliveryStatus);
+
 module.exports = router;

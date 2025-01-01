@@ -145,7 +145,12 @@
             
             <div>
                 <label for="status">Status:</label>
-                <input type="text" id="status" name="status" value="<%= order.status %>" required><br><br>
+                <select id="status" name="status" required>
+                    <option value="">Select Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                </select>
+                <br><br>
             </div>
             
             <button type="submit">Update Order</button>

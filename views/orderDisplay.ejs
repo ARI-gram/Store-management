@@ -37,6 +37,14 @@
             color: #555;
         }
 
+        .info-section {
+        margin-bottom: 20px;
+        }
+
+        .info-section p {
+            margin: 5px 0;
+            font-size: 1.1rem;
+        }       
         .title-section {
             text-align: center;
             margin-bottom: 20px;
@@ -137,6 +145,15 @@
         </header>
         <div class="title-section">
             <h1>Order for Store : <%= storeId %></h1>
+            
+            <section class="info-section">
+                <h2>Delivery Information</h2>
+                <% deliveries.forEach(delivery => { %>
+                    <p><strong>To Store:</strong> <%= delivery.to_store_id %></p>
+                    <!--<p><strong>From Store:</strong> <%= delivery.from_store_id %></p>-->
+                <% }); %>
+            </section>
+            
             <h2>Order List</h2>
         </div>
         <table>

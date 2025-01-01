@@ -78,7 +78,7 @@
                         <th>Units</th>
                         <th>Date In</th>
                         <th>Store ID</th>
-                        <th>Actions</th> <!-- New Action Column -->
+                        <th>Actions</th> 
                     </tr>
                 </thead>
                 <tbody>
@@ -95,7 +95,8 @@
                                 <!-- Action Buttons -->
                                 <a href="/<%= storeId %>/inventory/edit/<%= item.code %>" class="edit-btn">Edit</a>
                                 <a href="/<%= storeId %>/inventory/delete/<%= item.code %>" class="delete-btn" onclick="return confirm('Are you sure you want to delete this item?');">Delete</a>
-                            </td>
+                                <a href="/<%= storeId %>/inventory/utilize/<%= item.code %>" class="utilize-btn">Utilize</a> <!-- New Utilize Button -->
+                            </td>                            
                         </tr>
                     <% }); %>
                 </tbody>

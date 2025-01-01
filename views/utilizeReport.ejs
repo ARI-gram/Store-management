@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilization Report</title>
+    <link rel="stylesheet" href="/styles/utilizeReport.css">
+</head>
+<body>
+    <div class="menu-bar">
+        <ul>
+            <li><a href="/dashboard/<%= storeId %>">Dashboard</a></li>
+            <li><a href="/<%= storeId %>/inventory">Inventory</a></li>
+            <li><a href="/<%= storeId %>/orders">Orders</a></li>
+            <li><a href="/deliveries/<%= storeId %>">Deliveries</a></li>
+        </ul>
+    </div>
+    <h1>Utilization Report</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Item</th>
+                <th>Quantity Utilized</th>
+                <th>Units</th>
+                <th>Comments</th>
+                <th>Date Utilized</th>
+                <th>Actions</th> <!-- New Actions Column -->
+            </tr>
+        </thead>
+        <tbody>
+            <% utilization.forEach(record => { %>
+                <tr>
+                    <td><%= record.code %></td>
+                    <td><%= record.item %></td>
+                    <td><%= record.quantity %></td>
+                    <td><%= record.units %></td>
+                    <td><%= record.comments %></td>
+                    <td><%= record.date_utilized %></td>
+                    <td>
+                        <a href="/<%= storeId %>/utilize/edit/<%= record.code %>" class="edit-btn">Edit</a>
+                        <form action="/<%= storeId %>/utilize/delete/<%= record.code %>" method="POST" onsubmit="return confirm('Are you sure you want to delete this record?');">
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</body>
+</html>

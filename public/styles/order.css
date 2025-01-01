@@ -187,8 +187,12 @@ body.overlay-active::before {
 
 /* Add responsive design for smaller screens */
 @media screen and (max-width: 768px) {
+    .menu-bar ul {
+        flex-direction: column;
+        align-items: center;
+    }
+    
     .menu-bar ul li {
-        display: block;
         margin: 10px 0;
     }
 }

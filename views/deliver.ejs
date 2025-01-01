@@ -24,10 +24,8 @@
 
             <section class="info-section">
                 <h2>Delivery Information</h2>
-                <% deliveries.forEach(delivery => { %>
-                    <p><strong>To Store:</strong> <%= delivery.to_store_id %></p>
-                    <p><strong>From Store:</strong> <%= delivery.from_store_id %></p>
-                <% }); %>
+                    <p><strong>To Store:</strong> _______________________________</p> <br> <br>
+                    <p><strong>From Store:</strong> _____________________________</p>
             </section>          
 
             <section class="table-section">
@@ -56,18 +54,14 @@
 
             <section class="details-section">
                 <h3>Authorization Details</h3>
-                <% if (deliveries.length > 0) { %>
-                    <p><%= deliveries[0].authorization %></p>
-                <% } else { %>
-                    <p>No authorization details available.</p>
-                <% } %>
+                <p>Name: _____________________________________</p>
+                <p>Id No:_____________________________________</p>
+                <p>Phone No: __________________________________</p>
                 <br><br>
                 <h3>Driver Details</h3>
-                <% if (deliveries.length > 0) { %>
-                    <p><%= deliveries[0].vehicle_no %></p>
-                <% } else { %>
-                    <p>No driver details available.</p>
-                <% } %>
+                <p>Name: _____________________________________</p>
+                <p>Id No:_____________________________________</p>
+                <p>Phone No: _________________________________</p>
             </section>     
 
             <section class="confirmation-section">

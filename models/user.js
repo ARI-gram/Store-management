@@ -1,122 +1,182 @@
-const db = require('../db');
+require('dotenv').config();
+const { Pool } = require('pg');
+const pool = require('../db');
 
 // Create OTP table
-db.run(`
+(async () => {
+  const otpTableQuery = `
     CREATE TABLE IF NOT EXISTS otp_codes (
       email TEXT PRIMARY KEY,
       otp TEXT NOT NULL,
       expiry TIMESTAMP NOT NULL
-    )
-`);
-
-// Create Users table with fields for store_id and role
-db.run(`
+    );
+  `;
+  const usersTableQuery = `
     CREATE TABLE IF NOT EXISTS users (
       email TEXT PRIMARY KEY,
       store_id TEXT NOT NULL,
       role TEXT NOT NULL,
       status TEXT DEFAULT 'pending'
-    )
-`);
+    );
+  `;
+  try {
+    await pool.query(otpTableQuery);
+    await pool.query(usersTableQuery);
+    console.log('Tables created successfully.');
+  } catch (err) {
+    console.error('Error creating tables:', err);
+  }
+})();
 
-const saveOtp = (email, otp, expiry) => {
-    return new Promise((resolve, reject) => {
-        const query = `INSERT OR REPLACE INTO otp_codes (email, otp, expiry) VALUES (?, ?, ?)`;
-        db.run(query, [email, otp, expiry], function (err) {
-            if (err) reject(err);
-            else resolve();
-        });
-    });
+// Save OTP
+const saveOtp = async (email, otp, expiry) => {
+  const query = `
+    INSERT INTO otp_codes (email, otp, expiry) 
+    VALUES ($1, $2, $3)
+    ON CONFLICT (email) 
+    DO UPDATE SET otp = $2, expiry = $3;
+  `;
+  try {
+    await pool.query(query, [email, otp, expiry]);
+  } catch (err) {
+    console.error('Error saving OTP:', err);
+    throw err;
+  }
 };
 
-const verifyOtp = (email, otp) => {
-    return new Promise((resolve, reject) => {
-        const query = `SELECT * FROM otp_codes WHERE email = ? AND otp = ? AND expiry > datetime('now')`;
-        db.get(query, [email, otp], (err, row) => {
-            if (err) reject(err);
-            else resolve(!!row); // Return true if OTP is valid
-        });
-    });
+// Verify OTP
+const verifyOtp = async (email, otp) => {
+  const query = `
+    SELECT * FROM otp_codes 
+    WHERE email = $1 AND otp = $2 AND expiry > NOW();
+  `;
+  try {
+    const result = await pool.query(query, [email, otp]);
+    return result.rows.length > 0;
+  } catch (err) {
+    console.error('Error verifying OTP:', err);
+    throw err;
+  }
 };
 
-function createUser(email, storeId, role, callback) {
-    const query = `
-        INSERT INTO users (email, store_id, role, status) 
-        VALUES (?, ?, ?, 'pending')
-    `;
-    db.run(query, [email, storeId, role], function (err) {
-        if (err) {
-            if (err.code === 'SQLITE_CONSTRAINT') {
-                console.error(`Duplicate entry: User with email "${email}" and store ID "${storeId}" already exists.`);
-            } else {
-                console.error('Error inserting user:', err.message);
-            }
-            return callback(err);
-        }
-        callback(null, { id: this.lastID, email, storeId, role, status: 'pending' });
-    });
-}
+// Create User
+const createUser = async (email, storeId, role) => {
+  const query = `
+    INSERT INTO users (email, store_id, role, status) 
+    VALUES ($1, $2, $3, 'pending')
+    ON CONFLICT (email) 
+    DO NOTHING;
+  `;
+  try {
+    await pool.query(query, [email, storeId, role]);
+  } catch (err) {
+    console.error('Error creating user:', err);
+    throw err;
+  }
+};
 
-// Function to get a user by email and store_id
-function getUserByEmailAndStore(email, storeId, callback) {
-    const query = `SELECT * FROM users WHERE email = ? AND store_id = ?`;
-    db.get(query, [email, storeId], (err, row) => {
-        if (typeof callback === 'function') {
-            callback(err, row);
-        } else {
-            console.error('Callback is not a function');
-        }
-    });
-}
+// Get User by Email and Store
+const getUserByEmailAndStore = async (email, storeId) => {
+  const query = `
+    SELECT * FROM users 
+    WHERE email = $1 AND store_id = $2;
+  `;
+  try {
+    const result = await pool.query(query, [email, storeId]);
+    return result.rows[0];
+  } catch (err) {
+    console.error('Error fetching user by email and store:', err);
+    throw err;
+  }
+};
 
-// Function to update a user's status
-function updateUserStatus(email, status, callback) {
-    const query = `
-        UPDATE users 
-        SET status = ? 
-        WHERE email = ?
-    `;
-    db.run(query, [status, email], function (err) {
-        if (err) {
-            console.error('Error updating user status:', err.message);
-            return callback(err);
-        }
-        callback(null, this.changes); // this.changes indicates rows updated
-    });
-}
+// Update User Status
+const updateUserStatus = async (email, status) => {
+  const query = `
+    UPDATE users 
+    SET status = $1 
+    WHERE email = $2;
+  `;
+  try {
+    const result = await pool.query(query, [status, email]);
+    return result.rowCount; // Number of rows updated
+  } catch (err) {
+    console.error('Error updating user status:', err);
+    throw err;
+  }
+};
 
-// Function to delete a user by email
-function deleteUser(email, callback) {
-    const query = `
-        DELETE FROM users WHERE email = ?
-    `;
-    db.run(query, [email], function (err) {
-        if (err) {
-            console.error('Error deleting user:', err.message);
-            return callback(err);
-        }
-        callback(null, this.changes); // this.changes indicates rows deleted
-    });
-}
+// Delete User
+const deleteUser = async (email) => {
+  const query = `
+    DELETE FROM users 
+    WHERE email = $1;
+  `;
+  try {
+    const result = await pool.query(query, [email]);
+    return result.rowCount; // Number of rows deleted
+  } catch (err) {
+    console.error('Error deleting user:', err);
+    throw err;
+  }
+};
 
-function getUserByEmailStoreAndRole(email, storeId, role, callback) {
-    const query = `
-        SELECT * FROM users WHERE email = ? AND store_id = ? AND role = ?
-    `;
-    db.get(query, [email, storeId, role], (err, row) => {
-        callback(err, row);
-    });
-}
+// Get User by Email, Store, and Role
+const getUserByEmailStoreAndRole = async (email, storeId, role) => {
+  const query = `
+    SELECT * FROM users 
+    WHERE email = $1 AND store_id = $2 AND role = $3;
+  `;
+  try {
+    const result = await pool.query(query, [email, storeId, role]);
+    return result.rows[0];
+  } catch (err) {
+    console.error('Error fetching user by email, store, and role:', err);
+    throw err;
+  }
+};
 
-// Export the database and functions
+// Get User Count by Email and Store
+const getUserCountByEmailAndStore = async (email, storeId) => {
+  const query = `
+    SELECT COUNT(*) AS count 
+    FROM users 
+    WHERE email = $1 AND store_id = $2;
+  `;
+  try {
+    const result = await pool.query(query, [email, storeId]);
+    return parseInt(result.rows[0].count, 10);
+  } catch (err) {
+    console.error('Error counting users by email and store:', err);
+    throw err;
+  }
+};
+
+// Get User Count by Email
+const getUserCountByEmail = async (email) => {
+  const query = `
+    SELECT COUNT(*) AS count 
+    FROM users 
+    WHERE email = $1;
+  `;
+  try {
+    const result = await pool.query(query, [email]);
+    return parseInt(result.rows[0].count, 10);
+  } catch (err) {
+    console.error('Error counting users by email:', err);
+    throw err;
+  }
+};
+
 module.exports = {
-    db,
-    createUser,
-    getUserByEmailAndStore,
-    updateUserStatus,
-    deleteUser,
-    saveOtp,
-    verifyOtp,
-    getUserByEmailStoreAndRole, // Add this
+  pool,
+  createUser,
+  getUserByEmailAndStore,
+  updateUserStatus,
+  deleteUser,
+  saveOtp,
+  verifyOtp,
+  getUserByEmailStoreAndRole,
+  getUserCountByEmailAndStore,
+  getUserCountByEmail,
 };
-

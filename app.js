@@ -1,6 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const session = require('express-session'); // Import express-session
+const session = require('express-session');
+const cors = require('cors');
+
+// Import PostgreSQL database connection
+const pool = require('./db'); // Ensure you have a properly configured 'db.js' file
+
+// Import routes
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const logoutRoute = require('./routes/logoutRoute');
@@ -8,7 +14,6 @@ const inventoryRoutes = require('./routes/inventoryRoutes');
 const deliveryRoutes = require('./routes/deliveryRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const searchRoutes = require('./routes/searchRoutes');
-const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
@@ -24,7 +29,6 @@ app.use('/styles', express.static('public/styles'));
 app.use('/images', express.static('public/images'));
 app.use(express.static('public'));
 app.use(cors());
-
 
 // Set up session middleware
 app.use(
@@ -43,13 +47,24 @@ app.use('/', authRoutes);
 app.use('/', searchRoutes);
 app.use(orderRoutes);
 app.use(inventoryRoutes);
-app.use('/', deliveryRoutes); // Register deliveryRoutes AFTER logoutRoute
+app.use('/', deliveryRoutes); 
 app.use('/deliveries', deliveryRoutes);
 app.use(dashboardRoutes);
 
 // Root route
 app.get('/', (req, res) => {
     res.render('index'); // Render the 'views/index.ejs' file
+});
+
+// Test database connection
+app.get('/db-test', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT NOW() AS current_time;');
+        res.status(200).send(`Database connected successfully. Current time: ${result.rows[0].current_time}`);
+    } catch (err) {
+        console.error('Database connection error:', err);
+        res.status(500).send('Failed to connect to the database.');
+    }
 });
 
 // Start server

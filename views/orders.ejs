@@ -40,7 +40,7 @@
                 
                 <div>
                     <label for="code">Code:</label>
-                   <input type="text" id="code" name="code" required><br><br>
+                    <input type="text" id="code" name="code" required><br><br>
                 </div>
                 
                 <div>
@@ -65,7 +65,22 @@
                 
                 <div>
                     <label for="status">Status:</label>
-                    <input type="text" id="status" name="status" required><br><br>
+                    <select id="status" name="status" required>
+                        <option value="">Select Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                    </select>
+                    <br><br>
+                </div>
+             
+                <div>
+                    <label for="fromStoreId">From Store ID:</label>
+                    <input type="text" id="fromStoreId" name="fromStoreId" required placeholder="Store ID" value="<%= storeId %>" readonly><br><br>
+                </div>
+
+                <div>
+                    <label for="toStoreId">To Store ID:</label>
+                    <input type="text" id="toStoreId" name="toStoreId" required placeholder="Store name"><br><br>
                 </div>
                 
                 <button type="submit">Create Order</button>

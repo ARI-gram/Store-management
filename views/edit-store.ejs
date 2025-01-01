@@ -93,10 +93,33 @@
         padding: 8px;
       }
     }
+    .styled-link {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    background-color: #3498db; /* Button-like background */
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .styled-link:hover {
+        background-color: #2ecc71; /* Change color on hover */
+        transform: scale(1.05); /* Slightly enlarge */
+    }
+
+    .styled-link:active {
+        transform: scale(0.95); /* Slightly shrink on click */
+    }
+
   </style>
 </head>
 <body>
-  <div class="container">
+    <div class="container">
+      <a href="/admin" class="styled-link">Admin Dashboard</a> <br><br>
     <h1>Edit Store</h1>
     <form action="/update-store/<%= store.store_id %>" method="POST">
       <label for="store_id">Store ID:</label>

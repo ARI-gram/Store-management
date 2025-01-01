@@ -141,9 +141,14 @@ body {
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); /* Reduced shadow */
 }
 
-/* Hide print button when printing */
-@media print {
-    .actions-section {
-        display: none;
+/* Add responsive design for smaller screens */
+@media screen and (max-width: 768px) {
+    .menu-bar ul {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .menu-bar ul li {
+        margin: 10px 0;
     }
 }
