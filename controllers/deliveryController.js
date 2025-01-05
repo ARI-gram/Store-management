@@ -81,6 +81,81 @@ exports.createDelivery = async (req, res) => {
                 </div>
             `);
         }
+exports.createDelivery = async (req, res) => {
+    const {
+        code, item, description, quantity, units, dateSent, timeSent,
+        driver, authorization, vehicleNo, received, toStoreId
+    } = req.body;
+
+    const storeId = req.session.storeId || req.params.storeId;
+
+    try {
+        // Check if the `toStoreId` exists in the stores table
+        const storeCheckQuery = `
+            SELECT * FROM stores WHERE store_id = $1
+        `;
+        const storeCheckResult = await pool.query(storeCheckQuery, [toStoreId]);
+
+        if (storeCheckResult.rows.length === 0) {
+            return res.status(404).send(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Store Not Found</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            text-align: center;
+                            background-color: #f8f9fa;
+                            padding: 20px;
+                        }
+                        .message {
+                            font-size: 1.5em;
+                            color: #dc3545;
+                            margin-top: 20px;
+                        }
+                        .button {
+                            margin-top: 20px;
+                            padding: 10px 20px;
+                            font-size: 1em;
+                            color: #fff;
+                            background-color: #007bff;
+                            border: none;
+                            border-radius: 5px;
+                            text-decoration: none;
+                            cursor: pointer;
+                        }
+                        .button:hover {
+                            background-color: #0056b3;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>Store Not Found</h1>
+                    <p class="message">The destination store ID (${toStoreId}) does not exist in the system.</p>
+                    <a href="javascript:history.back()" class="button">Go Back</a>
+                </body>
+                </html>
+            `);
+        }
+
+        // Check if the item exists in the inventory for the source store
+        const inventoryQuery = `
+            SELECT * FROM inventory 
+            WHERE code = $1 AND item = $2 AND store_id = $3
+        `;
+        const inventoryResult = await pool.query(inventoryQuery, [code, item, storeId]);
+
+        if (inventoryResult.rows.length === 0) {
+            return res.status(404).send(`
+                <div style="text-align: center; font-family: Arial;">
+                    <h1>Not Found</h1>
+                    <p>Item not found in the inventory for the current store.</p>
+                </div>
+            `);
+        }
 
         const inventoryRow = inventoryResult.rows[0];
 
@@ -102,12 +177,12 @@ exports.createDelivery = async (req, res) => {
 
         // Insert delivery record
         const deliveryQuery = `
-            INSERT INTO deliveries (code, item, description, quantity, units, date_sent, time_sent, driver, "authorization", vehicle_no, from_store_id, to_store_id, received)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            INSERT INTO deliveries (code, item, description, quantity, units, date_sent, time_sent, driver, "authorization", vehicle_no, store_id, from_store_id, to_store_id, received)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         `;
         await pool.query(deliveryQuery, [
             code, item, description, quantity, units, dateSent, timeSent, driver,
-            authorization, vehicleNo, fromStoreId, toStoreId, received
+            authorization, vehicleNo, storeId, storeId, toStoreId, received
         ]);
 
         // Reduce the quantity in the source store's inventory
@@ -116,11 +191,12 @@ exports.createDelivery = async (req, res) => {
             SET quantity = quantity - $1
             WHERE code = $2 AND item = $3 AND store_id = $4
         `;
-        await pool.query(updateInventoryQuery, [quantity, code, item, fromStoreId]);
+        await pool.query(updateInventoryQuery, [quantity, code, item, storeId]);
 
         // Commit the transaction
         await pool.query('COMMIT');
-        res.redirect(`/deliveries/${fromStoreId}`);
+        res.redirect(`/deliveries/${storeId}`);
+
     } catch (err) {
         console.error('Error during transaction:', err);
 
