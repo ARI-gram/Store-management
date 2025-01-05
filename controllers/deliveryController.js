@@ -71,7 +71,7 @@ exports.createDelivery = async (req, res) => {
             SELECT * FROM inventory 
             WHERE code = $1 AND item = $2 AND store_id = $3
         `;
-        const inventoryResult = await pool.query(inventoryQuery, [code, item, fromStoreId]);
+        const inventoryResult = await pool.query(inventoryQuery, [code, item, storeId]);
 
         if (inventoryResult.rows.length === 0) {
             return res.status(404).send(`
