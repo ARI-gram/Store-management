@@ -8,14 +8,16 @@ exports.createDelivery = async (req, res) => {
         driver, authorization, vehicleNo, received, toStoreId
     } = req.body;
 
-    const fromStoreId = req.session.storeId; // Automatically set fromStoreId from session
+    const storeId = req.session.storeId || req.params.storeId;
 
     try {
-        // Check if the toStoreId exists in the stores table
-        const storeQuery = 'SELECT * FROM stores WHERE store_id = $1';
-        const storeResult = await pool.query(storeQuery, [toStoreId]);
+        // Check if the `toStoreId` exists in the stores table
+        const storeCheckQuery = `
+            SELECT * FROM stores WHERE store_id = $1
+        `;
+        const storeCheckResult = await pool.query(storeCheckQuery, [toStoreId]);
 
-        if (storeResult.rows.length === 0) {
+        if (storeCheckResult.rows.length === 0) {
             return res.status(404).send(`
                 <!DOCTYPE html>
                 <html lang="en">
@@ -26,21 +28,17 @@ exports.createDelivery = async (req, res) => {
                     <style>
                         body {
                             font-family: Arial, sans-serif;
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            justify-content: center;
-                            height: 100vh;
-                            margin: 0;
-                            background-color: #f8d7da;
+                            text-align: center;
+                            background-color: #f8f9fa;
+                            padding: 20px;
                         }
                         .message {
                             font-size: 1.5em;
-                            color: #721c24;
-                            text-align: center;
-                            margin-bottom: 20px;
+                            color: #dc3545;
+                            margin-top: 20px;
                         }
                         .button {
+                            margin-top: 20px;
                             padding: 10px 20px;
                             font-size: 1em;
                             color: #fff;
@@ -56,22 +54,20 @@ exports.createDelivery = async (req, res) => {
                     </style>
                 </head>
                 <body>
-                    <div class="message">
-                        <h1>Store Not Found</h1>
-                        <p>The destination store with ID "${toStoreId}" does not exist.</p>
-                    </div>
+                    <h1>Store Not Found</h1>
+                    <p class="message">The destination store ID (${toStoreId}) does not exist in the system.</p>
                     <a href="javascript:history.back()" class="button">Go Back</a>
                 </body>
                 </html>
             `);
         }
 
-        // Check if the item exists in inventory for the source store
+        // Check if the item exists in the inventory for the source store
         const inventoryQuery = `
             SELECT * FROM inventory 
             WHERE code = $1 AND item = $2 AND store_id = $3
         `;
-        const inventoryResult = await pool.query(inventoryQuery, [code, item, fromStoreId]);
+        const inventoryResult = await pool.query(inventoryQuery, [code, item, storeId]);
 
         if (inventoryResult.rows.length === 0) {
             return res.status(404).send(`
@@ -102,12 +98,12 @@ exports.createDelivery = async (req, res) => {
 
         // Insert delivery record
         const deliveryQuery = `
-            INSERT INTO deliveries (code, item, description, quantity, units, date_sent, time_sent, driver, "authorization", vehicle_no, from_store_id, to_store_id, received)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            INSERT INTO deliveries (code, item, description, quantity, units, date_sent, time_sent, driver, "authorization", vehicle_no, store_id, from_store_id, to_store_id, received)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         `;
         await pool.query(deliveryQuery, [
             code, item, description, quantity, units, dateSent, timeSent, driver,
-            authorization, vehicleNo, fromStoreId, toStoreId, received
+            authorization, vehicleNo, storeId, storeId, toStoreId, received
         ]);
 
         // Reduce the quantity in the source store's inventory
@@ -116,11 +112,12 @@ exports.createDelivery = async (req, res) => {
             SET quantity = quantity - $1
             WHERE code = $2 AND item = $3 AND store_id = $4
         `;
-        await pool.query(updateInventoryQuery, [quantity, code, item, fromStoreId]);
+        await pool.query(updateInventoryQuery, [quantity, code, item, storeId]);
 
         // Commit the transaction
         await pool.query('COMMIT');
-        res.redirect(`/deliveries/${fromStoreId}`);
+        res.redirect(`/deliveries/${storeId}`);
+
     } catch (err) {
         console.error('Error during transaction:', err);
 
