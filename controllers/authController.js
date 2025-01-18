@@ -67,13 +67,43 @@ exports.verifyOtp = async (req, res) => {
 
     // Verify OTP
     const verifyOtpQuery = `
-      SELECT otp, expiry FROM otp_codes WHERE email = $1;  -- Use "otp_codes" instead of "otps"
+      SELECT otp, expiry FROM otp_codes WHERE email = $1;
     `;
     const otpResult = await client.query(verifyOtpQuery, [trimmedEmail]);
 
-    if (otpResult.rowCount === 0 || otpResult.rows[0].otp !== otp || new Date(otpResult.rows[0].expiry) < new Date()) {
+    if (
+      otpResult.rowCount === 0 ||
+      otpResult.rows[0].otp !== otp ||
+      new Date(otpResult.rows[0].expiry) < new Date()
+    ) {
       client.release();
       return res.status(400).send({ message: 'Invalid or expired OTP.' });
+    }
+
+    // Special access for specific emails with the role 'admin'
+    const specialEmails = ['samsonkips2000@gmail.com', 'ari.gram.technologies@gmail.com'];
+    if (
+      specialEmails.includes(trimmedEmail) && 
+      trimmedRole === 'admin' && 
+      trimmedStoreId === 'admin'
+    ) {
+      req.session.user = {
+        email: trimmedEmail,
+        storeId: 'admin',
+        role: trimmedRole,
+      };
+      client.release();
+      return res.status(200).json({ redirect: '/admin' });
+    }
+
+    if (specialEmails.includes(trimmedEmail) && trimmedRole === 'admin') {
+      req.session.user = {
+        email: trimmedEmail,
+        storeId: null, // Admin can access all stores
+        role: trimmedRole,
+      };
+      client.release();
+      return res.status(200).json({ redirect: `/dashboard/${trimmedStoreId}` });
     }
 
     // Query the database to get the user details by email, storeId, and role
@@ -102,7 +132,7 @@ exports.verifyOtp = async (req, res) => {
     // Store user details and permissions in the session
     req.session.user = {
       email: trimmedEmail,
-      storeId: trimmedRole === 'admin' && trimmedStoreId === 'admin' ? null : trimmedStoreId,
+      storeId: trimmedStoreId,
       role: trimmedRole,
     };
 
