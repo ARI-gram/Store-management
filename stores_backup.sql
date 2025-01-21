@@ -323,6 +323,7 @@ COPY public.inventory (id, code, item, description, quantity, units, date_in, st
 13	4578 D	nails	brass nails	6	bags	2024-12-25	kiambu
 1	4578	nails	ordinary nails	35	bags	2024-12-14	kiambu
 10	8888	filler	gyproc filler, gyproc filler, gyproc filler	5	bags	2025-01-01 10:39:34.514442+03	kiambu
+54	0004	brush	4" paint brush	2	No	2025-01-20	kiambu
 42	gumboot001	gumboots	no 10	5	pairs	2024-12-30	vcc
 \.
 
@@ -348,8 +349,8 @@ COPY public.orders (id, item_name, code, description, quantity, units, date_orde
 --
 
 COPY public.otp_codes (email, otp, expiry) FROM stdin;
-samsonkips2000@gmail.com	963423	2025-01-01 02:00:38.694
-ari.gram.technologies@gmail.com	943662	2025-01-01 10:46:33.406
+ari.gram.technologies@gmail.com	143131	2025-01-01 12:44:04.77
+samsonkips2000@gmail.com	800970	2025-01-20 15:24:44.108
 \.
 
 
@@ -413,6 +414,7 @@ COPY public.utilize (id, code, store_id, quantity, units, comments, date_utilize
 3	A111	kiambu	10	pairs 	fore mman	2024-12-29 19:01:26.167698
 4	4578 B	kiambu	14	pkts	first floor	2024-12-30 09:46:04.85428
 5	01111	kiambu	2	pairs 	used by two new painters.	2024-12-30 15:08:18.611056
+8	0004	kiambu	10	No	painting the first floor	2025-01-20 15:43:29.093033
 \.
 
 
@@ -427,7 +429,7 @@ SELECT pg_catalog.setval('public.deliveries_id_seq', 31, true);
 -- Name: inventory_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.inventory_id_seq', 53, true);
+SELECT pg_catalog.setval('public.inventory_id_seq', 54, true);
 
 
 --
@@ -441,7 +443,7 @@ SELECT pg_catalog.setval('public.orders_id_seq', 15, true);
 -- Name: utilize_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.utilize_id_seq', 7, true);
+SELECT pg_catalog.setval('public.utilize_id_seq', 8, true);
 
 
 --
