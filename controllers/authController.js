@@ -159,6 +159,39 @@ exports.verifyOtp = async (req, res) => {
   }
 };
 
+exports.getUserDetails = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+      return res.status(400).send({ message: 'Email is required.' });
+  }
+
+  try {
+      const client = await pool.connect();
+
+      // Query to fetch storeId and role based on the email
+      const query = `
+          SELECT store_id, role 
+          FROM users 
+          WHERE email = $1;
+      `;
+      const result = await client.query(query, [email.trim()]);
+
+      client.release();
+
+      if (result.rowCount === 0) {
+          return res.status(404).send({ message: 'No user found with the provided email.' });
+      }
+
+      // Return the fetched storeId and role
+      const { store_id, role } = result.rows[0];
+      return res.status(200).send({ storeId: store_id, role });
+  } catch (error) {
+      console.error('Error fetching user details:', error);
+      return res.status(500).send({ message: 'Error fetching user details.' });
+  }
+};
+
 // Sign Up
 exports.signup = async (req, res) => {
   const { signInEmail, signInStoreId, signInRole } = req.body;

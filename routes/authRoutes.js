@@ -8,6 +8,7 @@ router.post('/verify-otp', authController.verifyOtp);
 router.get('/admin', (req, res) => {
   res.render('admin'); 
 });
+router.post('/getUserDetails', authController.getUserDetails);
 router.post('/signup', authController.signup);
 router.get('/pending-users', authController.getPendingUsers);
 router.post('/approve-user', authController.approveUser);

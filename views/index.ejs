@@ -276,6 +276,34 @@
             });
         });
     
+        async function fetchUserDetails() {
+        const email = document.getElementById('email').value;
+
+        if (!email) return;
+
+        try {
+            const response = await fetch('/getUserDetails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('storeId').value = data.storeId || '';
+                document.getElementById('role').value = data.role || '';
+            } else {
+                const error = await response.json();
+                console.error('Error fetching user details:', error.message);
+                alert('Could not fetch user details. Please check the email or contact support.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An unexpected error occurred. Please try again later.');
+        }
+    }
     </script>    
 </body>
 </html>
