@@ -19,6 +19,24 @@ exports.displayOrders = async (req, res) => {
     }
 };
 
+// ✅ View details of a specific order
+exports.viewOrderDetails = async (req, res) => {
+    const { storeId, orderId } = req.params;
+
+    const query = "SELECT * FROM orders WHERE id = $1 AND store_id = $2";
+    try {
+        const result = await pool.query(query, [orderId, storeId]);
+        if (result.rows.length === 0) {
+            return res.status(404).send("Order not found.");
+        }
+        const order = result.rows[0];
+        res.render('orderDetails', { order, storeId });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error retrieving order details.");
+    }
+};
+
 exports.createOrder = async (req, res) => {
     const { item, code, description, quantity, units, dateOrdered, status, fromStoreId, toStoreId } = req.body;
     const storeId = req.params.storeId;
@@ -81,7 +99,7 @@ exports.editOrderStatus = async (req, res) => {
     const storeId = req.query.storeId || req.params.storeId;
 
     try {
-        const query = `SELECT id, status FROM orders WHERE id = $1`;
+        const query = `SELECT id, status, checked_by, date_checked, supplier, quantity_supplied, units_supplied FROM orders WHERE id = $1`;
         const result = await pool.query(query, [orderId]);
 
         if (result.rows.length === 0) {
@@ -90,7 +108,11 @@ exports.editOrderStatus = async (req, res) => {
 
         const order = result.rows[0];
 
-        // Prevent editing if the status has already been updated
+        // Convert date_checked to a Date object if it exists
+        if (order.date_checked) {
+            order.date_checked = new Date(order.date_checked);
+        }
+
         if (order.status !== 'Pending') {
             return res.render('EditStatus', {
                 error: "Status already updated.",
@@ -99,7 +121,6 @@ exports.editOrderStatus = async (req, res) => {
             });
         }
 
-        // Pass storeId to the view
         res.render('EditStatus', { order, error: null, storeId });
     } catch (err) {
         console.error(err);
@@ -107,21 +128,17 @@ exports.editOrderStatus = async (req, res) => {
     }
 };
 
+// ✅ Update order status
 exports.updateOrderStatus = async (req, res) => {
     const orderId = req.params.orderId;
-    const { status } = req.body;
+    const { status, checked_by, date_checked, supplier, quantity_supplied, units_supplied } = req.body;
     const storeId = req.query.storeId;
 
     try {
-        if (!orderId) {
-            return res.status(400).send("Order ID is required.");
+        if (!orderId || !storeId) {
+            return res.status(400).send("Order ID and Store ID are required.");
         }
 
-        if (!storeId) {
-            return res.status(400).send("Store ID is required.");
-        }
-
-        // Check if the order exists
         const checkQuery = `SELECT status FROM orders WHERE id = $1`;
         const checkResult = await pool.query(checkQuery, [orderId]);
 
@@ -131,7 +148,6 @@ exports.updateOrderStatus = async (req, res) => {
 
         const order = checkResult.rows[0];
 
-        // Prevent updating if the status is not 'Pending'
         if (order.status !== 'Pending') {
             return res.render('EditStatus', {
                 error: "Status already updated.",
@@ -140,17 +156,38 @@ exports.updateOrderStatus = async (req, res) => {
             });
         }
 
-        // Update order status
-        const updateQuery = `UPDATE orders SET status = $1 WHERE id = $2`;
-        await pool.query(updateQuery, [status, orderId]);
+        // Update query for the order
+        const updateQuery = `
+            UPDATE orders
+            SET 
+                status = $1, 
+                checked_by = $2, 
+                date_checked = $3, 
+                supplier = $4, 
+                quantity_supplied = $5, 
+                units_supplied = $6
+            WHERE id = $7
+        `;
 
-        // Redirect to orders list with success message
+        // Execute the update query
+        await pool.query(updateQuery, [
+            status, 
+            checked_by || null, 
+            date_checked || null, 
+            supplier || null, 
+            quantity_supplied || null, 
+            units_supplied || null, 
+            orderId
+        ]);
+
+        // Redirect with success message
         res.redirect(`/${storeId}/orders?message=Status updated successfully`);
     } catch (err) {
         console.error("Error updating order status:", err);
         res.status(500).send("Error updating order status.");
     }
 };
+
 
 // Middleware to check admin role
 const checkAdminRole = (req, res, next) => {

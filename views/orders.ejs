@@ -116,10 +116,10 @@
                             <td><%= order.status %></td>
                             <td><%= order.store_id %></td>
                             <td>
-                                <!-- Edit and Delete buttons -->
+                                <a href="/<%= storeId %>/orders/view/<%= order.id %>">View Details</a> | 
                                 <a href="/<%= storeId %>/orders/edit/<%= order.id %>">Edit</a> | 
                                 <a href="/<%= storeId %>/orders/delete/<%= order.id %>">Delete</a>
-                            </td>
+                            </td>                           
                         </tr>
                     <% }); %>
                 </tbody>

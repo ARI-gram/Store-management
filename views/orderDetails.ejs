@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <link rel="stylesheet" href="/styles/order.css">
+</head>
+<body>
+    <div class="menu-bar">
+        <ul>
+            <li><a href="/dashboard/<%= storeId %>">Dashboard</a></li>
+            <li><a href="/<%= storeId %>/inventory">Inventory</a></li>
+            <li><a href="/<%= storeId %>/orders">Orders</a></li>
+            <li><a href="/deliveries/<%= storeId %>">Deliveries</a></li>
+        </ul>
+    </div>
+
+    <div class="header">
+        <h1>Order Details for Order ID: <%= order.id %></h1>
+    </div>
+
+    <div class="content">
+        <table>
+            <tr>
+                <th>Item</th>
+                <td><%= order.item_name %></td>
+            </tr>
+            <tr>
+                <th>Code</th>
+                <td><%= order.code %></td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td><%= order.description %></td>
+            </tr>
+            <tr>
+                <th>Quantity</th>
+                <td><%= order.quantity %></td>
+            </tr>
+            <tr>
+                <th>Units</th>
+                <td><%= order.units %></td>
+            </tr>
+            <tr>
+                <th>Date Ordered</th>
+                <td><%= order.date_ordered %></td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td><%= order.status %></td>
+            </tr>
+            <tr>
+                <th>From Store</th>
+                <td><%= order.store_id %></td>
+            </tr>
+            <tr>
+                <th>To Store</th>
+                <td><%= order.to_store_id %></td>
+            </tr>
+            <tr>
+                <th>Checked By</th>
+                <td><%= order.checked_by %></td>
+            </tr>
+            <tr>
+                <th>Date Checked</th>
+                <td><%= order.date_checked %></td>
+            </tr>
+            <tr>
+                <th>Supplier</th>
+                <td><%= order.supplier %></td>
+            </tr>
+            <tr>
+                <th>Quantity Supplied</th>
+                <td><%= order.quantity_supplied %></td>
+            </tr>
+            <tr>
+                <th>Units Supplied</th>
+                <td><%= order.units_supplied %></td>
+            </tr>
+        </table>
+        <br>
+        <a href="/<%= storeId %>/orders">Back to Orders</a>
+        </div>
+</body>
+</html>

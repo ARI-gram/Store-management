@@ -36,4 +36,6 @@ router.get('/:storeId/edit-order/:orderId', orderController.editOrderStatus);
 // Route to handle the status update
 router.post('/orders/:orderId/update-status', orderController.updateOrderStatus);
 
+router.get('/:storeId/orders/view/:orderId', orderController.viewOrderDetails);
+
 module.exports = router;
